@@ -1,30 +1,74 @@
 <?php include_once "header.php"; ?>
 
 <?php include_once "leftCol.php"; ?>
+
+<?php
+	//error_reporting(1);
+
+	$conexao = new mysqli("localhost", "redesocial", "rede1234","redesocial");
+	if($conexao -> connect_error){
+		echo "Erro ao conectar: " . $conexao -> connect_error . "<br>";
+	} 		
+	
+	if($_POST != NULL){	
+				
+		$user_id = $_SESSION["user_id"];
+		$name = $_POST["name"];
+		$email = $_POST["email"];
+		$img = $_POST["img"];
+		$sql = "UPDATE TblUser set name = '$name', email = '$email', img = '$img' where user_id = $user_id";			
+		
+		$sucesso = $conexao->query($sql);
+
+		if($sucesso){
+			$_SESSION["name"]=$name;
+			$_SESSION["img"]=$img;
+			echo "<script>alert('Atualizado com sucesso!')</script>";
+			header('location:cadastro.php');	
+		} else {
+			echo "<script>alert('Falha na alteração dos dados')</script>";
+		}	
+		
+	}  else {
+		
+		$user_id = $_SESSION["user_id"];
+		$sql = "SELECT * from TblUser where user_id = $user_id";
+		$sucesso = $conexao->query($sql);
+	
+		if($sucesso){
+			$row = $sucesso->fetch_assoc();
+			$name = $row["name"];
+			$email = $row["email"];
+			$img = $row["img"];
+		} else {
+			echo "<script>alert('Falha na leitura dos registros cadastrados')</script>";
+		}
+	}
+?>
 	
     <!-- Middle Column -->
     <div class="w3-col m9">
     
       <div class="col-lg-12">
-		<h1 style="text-align:center;" class="mb-3">Edit Profile</h1>
+		<h1 style="text-align:center;" class="mb-3">Editar Profile</h1>
 		<hr>
-		<form>
+		<form method="POST">
 			<div class="row">
 				<div class="col-6">
 					<div class="form-group">
-						<input type="text" class="form-control" name="name" placeholder="Name" required>
+						<input type="text" class="form-control" name="name" placeholder="Name" value="<?php echo $name ?>" required>
 					</div>
 				</div>
 				<div class="col-6">
 					<div class="form-group">
-						<input type="email" class="form-control" name="email" placeholder="E-mail" required>
+						<input type="email" class="form-control" name="email" value="<?php echo $email ?>" placeholder="E-mail" required>
 					</div>					
 				</div>
 			</div>			
 			<div class="row">
 				<div class="col-12">
 					<div class="form-group">
-						<input type="text" class="form-control" name="img" placeholder="Picture URL" required>
+						<input type="text" class="form-control" name="img" value="<?php echo $img ?>" placeholder="Picture URL" required>
 					</div>					
 				</div>			
 			</div>

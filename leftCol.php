@@ -1,3 +1,51 @@
+<?php
+if(isset($_GET['namefriend'])){	
+	$name = $_GET["namefriend"];
+	$img = $_GET["img"];
+} else {
+	
+	$name = $_SESSION["name"];
+	$img = $_SESSION["img"];
+}
+?>
+
+<?php
+	error_reporting(1);
+
+	if($_POST != NULL){	
+		$conexao = new mysqli("localhost", "redesocial", "rede1234","redesocial");
+		if($conexao -> connect_error){
+			echo "Erro ao conectar: " . $conexao -> connect_error . "<br>";
+		} 		
+		
+		if (isset($_POST['accept'])) {
+			
+			$user_id = $_SESSION["user_id"];
+			$user_id_requester = $_POST["user_id"];
+			$sql = "UPDATE friend set accepted = 1 where requester_id = $user_id_requester AND requested_id = $user_id";			
+			
+			$sucesso = $conexao->query($sql);
+	
+			if($sucesso){
+				echo "<script>alert('Amizade aceita!')</script>";
+			} else {
+				echo "<script>alert('Falha ao aceitar solicitação de amizade.')</script>";
+			}	
+		
+		} else if (isset($_POST['reject'])){
+			$user_id = $_SESSION["user_id"];
+			$user_id_requester = $_POST["user_id"];
+			$sql = "DELETE FROM friend where requester_id = $user_id_requester AND requested_id = $user_id";	
+			$sucesso = $conexao->query($sql);			
+			if($sucesso){
+				echo "<script>alert('Amizade rejeitada!')</script>";
+			} else {
+				echo "<script>alert('Falha ao rejeitar solicitação de amizade.')</script>";
+			}	
+		}
+	}
+?>
+
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">    
   <!-- The Grid -->
@@ -7,84 +55,57 @@
       <!-- Profile -->
       <div class="w3-card w3-round w3-white">
         <div class="w3-container">
-         <h4 class="w3-center">My Profile</h4>
-         <p class="w3-center"><img src="/w3images/avatar3.png" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
-         <hr>
-         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> Designer, UI</p>
-         <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> London, UK</p>
-         <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> April 1, 1988</p>
+         <h4 class="w3-center"><?php echo $name ?></h4>
+         <p class="w3-center"><img src="<?php echo $img ?>" class="w3-circle" style="height:106px;width:106px" alt=""></p>
         </div>
       </div>
       <br>
+	  
+	  <?php
+			
+				$conexao = new mysqli("localhost", "redesocial", "rede1234","redesocial");
+				if($conexao -> connect_error){
+					echo "Erro ao conectar: " . $conexao -> connect_error . "<br>";
+				} 	
+				$user_id = $_SESSION["user_id"];
+				
+				$sql = "select u.user_id,u.name,u.img from friend f
+				JOIN TblUser u
+				ON f.requester_id = u.user_id
+				WHERE f.requested_id = $user_id
+				AND accepted = 0
+					";		
+				
+				$sucesso = $conexao->query($sql);
+				
+				if($sucesso){
+					if(mysqli_num_rows  ($sucesso) > 0){
+						while ($row = mysqli_fetch_array($sucesso)) {
+							$name = $row["name"];
+							$img = $row["img"];
+							$user_id = $row["user_id"];
+							echo '
+							<div class="w3-container w3-card w3-white w3-round w3-margin">
+								<br>								
+								<a href="posts.php?user_id='.$user_id.'&namefriend='.$name.'&img='.$img.'"><img style="height:100px; width:100px;" src="' . $img . '"></a>
+								<h4>' . $name . '</h4>
+								<hr class="w3-clear">	
+								<form method="POST">
+									<input type="hidden" class="mb-1 mt-1 w3-button w3-theme" name="user_id" class="btn btn-dark" value="' . $user_id. '">								
+									<input type="submit" class="mb-1 mt-1 w3-button w3-theme" name="accept" class="btn btn-dark" value="Aceitar">								
+									<input type="submit" class="mb-1 mt-1 w3-button w3-theme" name="reject" class="btn btn-dark" value="Rejeitar">
+								<form>
+							</div>
+							';							
+							
+						}						
+					}	
+				} else {
+					echo "<script>alert('Falha na conexão ao ler solicitações de amizade.')</script>";
+				}		
+			?>		
       
-      <!-- Accordion -->
-      <div class="w3-card w3-round">
-        <div class="w3-white">
-          <button onclick="myFunction('Demo1')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-circle-o-notch fa-fw w3-margin-right"></i> My Groups</button>
-          <div id="Demo1" class="w3-hide w3-container">
-            <p>Some text..</p>
-          </div>
-          <button onclick="myFunction('Demo2')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-calendar-check-o fa-fw w3-margin-right"></i> My Events</button>
-          <div id="Demo2" class="w3-hide w3-container">
-            <p>Some other text..</p>
-          </div>
-          <button onclick="myFunction('Demo3')" class="w3-button w3-block w3-theme-l1 w3-left-align"><i class="fa fa-users fa-fw w3-margin-right"></i> My Photos</button>
-          <div id="Demo3" class="w3-hide w3-container">
-         <div class="w3-row-padding">
-         <br>
-           <div class="w3-half">
-             <img src="/w3images/lights.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/nature.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/mountains.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/forest.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/nature.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-           <div class="w3-half">
-             <img src="/w3images/snow.jpg" style="width:100%" class="w3-margin-bottom">
-           </div>
-         </div>
-          </div>
-        </div>      
-      </div>
-      <br>
-      
-      <!-- Interests --> 
-      <div class="w3-card w3-round w3-white w3-hide-small">
-        <div class="w3-container">
-          <p>Interests</p>
-          <p>
-            <span class="w3-tag w3-small w3-theme-d5">News</span>
-            <span class="w3-tag w3-small w3-theme-d4">W3Schools</span>
-            <span class="w3-tag w3-small w3-theme-d3">Labels</span>
-            <span class="w3-tag w3-small w3-theme-d2">Games</span>
-            <span class="w3-tag w3-small w3-theme-d1">Friends</span>
-            <span class="w3-tag w3-small w3-theme">Games</span>
-            <span class="w3-tag w3-small w3-theme-l1">Friends</span>
-            <span class="w3-tag w3-small w3-theme-l2">Food</span>
-            <span class="w3-tag w3-small w3-theme-l3">Design</span>
-            <span class="w3-tag w3-small w3-theme-l4">Art</span>
-            <span class="w3-tag w3-small w3-theme-l5">Photos</span>
-          </p>
-        </div>
-      </div>
-      <br>
-      
-      <!-- Alert Box -->
-      <div class="w3-container w3-display-container w3-round w3-theme-l4 w3-border w3-theme-border w3-margin-bottom w3-hide-small">
-        <span onclick="this.parentElement.style.display='none'" class="w3-button w3-theme-l3 w3-display-topright">
-          <i class="fa fa-remove"></i>
-        </span>
-        <p><strong>Hey!</strong></p>
-        <p>People are looking at your profile. Find out who.</p>
-      </div>
+   
     
     <!-- End Left Column -->
     </div>

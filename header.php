@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+
+<?php
+session_start();
+ $user_id = $_SESSION["user_id"];
+?>
 <html>
 <title>YouSocial</title>
 <meta charset="UTF-8">
@@ -16,11 +21,11 @@ html, body, h1, h2, h3, h4, h5 {font-family: "Open Sans", sans-serif}
 <div class="w3-top">
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
-  <a href="inicio.php" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
-  <a href="posts.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Posts"><i class="fa fa-id-card-o"></i></a>
-  <a href="search.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Search"><i class="fa fa-search"></i></a>
+  <a href="index.php" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
+  <a href=<?php echo 'posts.php?user_id='.$user_id ?> class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Posts"><i class="fa fa-id-card-o"></i></a>
   <a href="cadastro.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Profile"><i class="fa fa-user"></i></a>
-  <a href="requests.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Requests"><i class="fa fa-envelope"></i></a>
+  <a href="friends.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Friends"><i class="fa fa-search"></i></a>
+  <a href="login.php" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" title="Sair"><i class="fa fa-sign-out"></i></a>
  </div>
 </div>
 
